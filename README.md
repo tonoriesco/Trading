@@ -2,16 +2,11 @@
 
 Systematic Trading in python
 
-Tono Riesco
+[https://riesco.ch](Tono Riesco)
 
-[https://riesco.ch](Riesco)
-
-
-Version 0.1
-
+Version 0.1 
 
 2020-07-04
-
 
 ## Release notes
 

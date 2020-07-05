@@ -1,0 +1,12 @@
+balance = 1000000
+valor_stop = 100
+btc_comprados = 0
+compras = 0
+compra = 100000
+ventas_ganadoras = 0
+ventas_perdedoras = 0
+ganancia_total = 0
+comision = 2.0
+comisiones = 0
+moneda = "BTC"
+lastrun = "2020-07-04_16:03:01"

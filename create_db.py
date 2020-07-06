@@ -6,20 +6,22 @@ con = sqlite3.connect(DATABASE)
 cur = con.cursor()
 
 create_table = """
-CREATE TABLE  IF NOT EXISTS datos(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    balance REAL DEFAULT 1000000,
-    valor_stop REAL DEFAULT 100,
-    objetos_comprados INTEGER DEFAULT 0,
-    compra INTEGER DEFAULT 100000,
-    compras INTEGER DEFAULT 0,
-    ventas_ganadoras INTEGER DEFAULT 0,
-    ventas_perdedoras INTEGER DEFAULT 0,
-    ganancia_total REAL DEFAULT 0,
-    comision REAL DEFAULT 2.0,
-    comisiones REAL DEFAULT 0,
-    moneda TEXT
-    )
+CREATE TABLE IF NOT EXISTS "datos" (
+    "id"    INTEGER,
+    "date"    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "balance"    REAL DEFAULT 1000000,
+    "stop_value"    REAL DEFAULT 100,
+    "value_each_purchase"    INTEGER DEFAULT 100000,
+    "buying_times"    INTEGER DEFAULT 0,
+    "winning_sales"    INTEGER DEFAULT 0,
+    "loosing_sales"    INTEGER DEFAULT 0,
+    "earned_money"    REAL DEFAULT 0,
+    "commission_broker"    REAL DEFAULT 2.0,
+    "total_fees_broker"    REAL DEFAULT 0,
+    "stock"    TEXT DEFAULT 'APPL',
+    "price_now"    REAL DEFAULT 100.00,
+    "purchased_items"    REAL DEFAULT 0,
+    PRIMARY KEY("id" AUTOINCREMENT)
+);
 """
 cur.execute(create_table)

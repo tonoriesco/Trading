@@ -1,6 +1,8 @@
+#!./env/bin/python
+
 import sqlite3
 
-DATABASE = "backtesting.sqlite3"
+DATABASE = "datos.sqlite3"
 
 con = sqlite3.connect(DATABASE)
 cur = con.cursor()

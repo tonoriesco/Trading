@@ -1,177 +1,170 @@
 #!/usr/bin/env python3
 
 import sqlite3
-import random
+
+# import random
 
 # import yahoo_fin.stock_info
 from yahoo_fin.stock_info import get_live_price
 import time
 import os
+
+import sys
 from datetime import datetime
 
+STOCK = sys.argv[1]
+# STOCK = "EURUSD=X"
 DATABASE = "datos.sqlite3"
 
-balance = 1000000
-valor_stop = 100
-objetos_comprados = 0
-compras = 0
-compra = 100000
-ventas_ganadoras = 0
-ventas_perdedoras = 0
-ganancia_total = 0
-comision = 2.0
-comisiones = 0
-moneda = "BTC"
 
+def db_query(query, *args):
+    con = None
+    data = None
 
-def do_query(path, query, one=True, args=None, commit=False):
-    """
-    do_query - Run a SQLite query, waiting for DB in necessary
-
-    Args:
-        path (str): path to DB file
-        query (str): SQL query
-        one (bool): if True, get ony one row, if False, all rows
-        args (list): values for `?` placeholders in qquery
-        commit (bool): whether or not to commit after running query
-    Returns:
-        list of lists: fetchall() for the query
-    """
-    if args is None:
-        args = []
-    for attempt in range(3):
-        try:
-            con = sqlite3.connect(path)
-            cur = con.cursor()
-            cur.execute(query, args)
-            if one:
-                ans = cur.fetchone()
-            else:
-                ans = cur.fetchall
-            if commit:
-                con.commit()
-            cur.close()
+    try:
+        con = sqlite3.connect(DATABASE)
+        cur = con.cursor()
+        cur.execute(query, tuple(args))
+        data = cur.fetchall()
+        if not data:
+            con.commit()
+    except sqlite3.Error as e:
+        # self.log.error("Database error: %s" % e)
+        print("Database error: %s" % e)
+    except Exception as e:
+        # self.log.error("Exception in _query: %s" % e)
+        print("Exception in _query: %s" % e)
+    finally:
+        if con:
             con.close()
-            del cur
-            del con
-            return ans
-        except sqlite3.OperationalError:
-            time.sleep(random.randint(1, 3))
+    return data
 
 
-def insert_values(task):
-    """
-    Create a new task
-    :param task:
-    :return: last id from table
-    """
-    sql = """INSERT INTO datos(balance, valor_stop, objetos_comprados,
-        compra ,compras, ventas_ganadoras, ventas_perdedoras,
-        ganancia_total, comision, comisiones, moneda)
-              VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-              """
-    con = sqlite3.connect(DATABASE)
-    cur = con.cursor()
-    cur.execute(sql, task)
-    con.commit()
-    cur.close()
-    con.close()
-    return cur.lastrowid
+# def insert_values(table, task):
+#     """
+#     Create a new task
+#     :param task:
+#     :return: last id from table
+#     """
+#     sql = """INSERT INTO datos (balance, stop_value, value_each_purchase, purchased_items,
+#         winning_sales, loosing_sales,
+#         earned_money, commission_broker, total_fees_broker, stock, price_now)
+#               VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+#               """
+#     con = sqlite3.connect(DATABASE)
+#     cur = con.cursor()
+#     cur.execute(sql, task)
+#     con.commit()
+#     cur.close()
+#     con.close()
+#     return cur.lastrowid
 
 
 # con = sqlite3.connect(DATABASE)
 # cur = con.cursor()
 
-
-sql_load = "SELECT * FROM datos ORDER BY id DESC LIMIT 1"
-row = do_query(DATABASE, sql_load)
-
-# cur.execute(sql_load)
-# row = cur.fetchone()
-# if con:
-#     con.close()
-# # with open("data.json") as data_json:
-# #     var_read = json.load(data_json)
-
-balance = row[2]
-valor_stop = row[3]
-objetos_comprados = row[4]
-compra = row[5]
-compras = row[6]
-ventas_ganadoras = row[7]
-ventas_perdedoras = row[8]
-ganancia_total = row[9]
-comision = row[10]
-comisiones = row[11]
-moneda = row[12]
+try:
+    sql_load = "SELECT * FROM datos WHERE stock=?  ORDER BY id DESC LIMIT 1"
+    row = db_query(sql_load, STOCK)
+    balance = row[2]
+    stop_value = row[3]
+    value_each_purchase = row[4]
+    buying_times = row[5]
+    winning_sales = row[6]
+    loosing_sales = row[7]
+    earned_money = row[8]
+    commission_broker = row[9]
+    total_fees_broker = row[10]
+    stock = STOCK
+    purchased_items = row[12]
+# price_now = row[12]
+except Exception:
+    balance = 1000000
+    stop_value = 100
+    value_each_purchase = 100000
+    buying_times = 0
+    winning_sales = 0
+    loosing_sales = 0
+    earned_money = 0
+    commission_broker = 2.0
+    total_fees_broker = 0
+    stock = STOCK
+    purchased_items = 0
 
 
 startTime = datetime.now()
 
 try:
     while True:
-        precio_actual = get_live_price("BTC-USD")
+        # Get new price for the stock
+        price_now = get_live_price(STOCK)
 
         # Compra
-        if objetos_comprados <= 0:
-            objetos_comprados = compra / precio_actual
-            balance -= compra + comision
-            compras += 1
-            comisiones += comision
-            ganancia_total -= comision
+        if purchased_items <= 0:
+            value_position_now = value_each_purchase / price_now
+            purchased_items = value_position_now
+            balance -= value_position_now + commission_broker
+            buying_times += 1
+            total_fees_broker += commission_broker
+            earned_money -= commission_broker
 
-        valor_btc_ahora = precio_actual * objetos_comprados
+        value_position_now = price_now * purchased_items
 
         # Venta ganancia
-        if valor_btc_ahora > compra + (2 * valor_stop):
-            balance += valor_btc_ahora - comision
-            ganancia_total += valor_btc_ahora - compra
-            objetos_comprados = 0
-            ventas_ganadoras += 1
-            comisiones += comision
+        if value_position_now > value_each_purchase + (2 * stop_value):
+            balance += value_position_now - commission_broker
+            earned_money += value_position_now - value_each_purchase
+            purchased_items = 0
+            winning_sales += 1
+            total_fees_broker += commission_broker
 
         # Venta perdida
-        if valor_btc_ahora < compra - valor_stop:
-            balance += valor_btc_ahora - comision
-            ganancia_total += valor_btc_ahora - compra
-            objetos_comprados = 0
-            ventas_perdedoras += 1
-            comisiones += comision
+        if value_position_now < value_each_purchase - stop_value:
+            balance += value_position_now - commission_broker
+            earned_money += value_position_now - value_each_purchase
+            purchased_items = 0
+            loosing_sales += 1
+            total_fees_broker += commission_broker
 
         os.system("clear")
         print(
             f"Balance {balance:,.2f} EUR\n\
-Precio {moneda} ahora: {precio_actual:,.2f} EUR\n\
-{moneda} Comprados: {objetos_comprados:,.2f} {moneda}\n\
-Valor {moneda} a la compra: {compra:,.2f} EUR\n\
-Valor {moneda} ahora: {valor_btc_ahora:,.2f} EUR\n\
-Compras: {compras}\n\
-Comision por operacion: {comision:,.2f} EUR\n\
-Comisiones Totales: {comisiones:,.2f} EUR\n\
-Ventas Ganadoras: {ventas_ganadoras} \n\
-Ventas Perdedoras: {ventas_perdedoras} \n\
-Ganacias hasta ahora: {ganancia_total:,.2f} EUR\n\
+Price of {stock} now: {price_now:,.4f} EUR\n\
+{stock} Comprados: {purchased_items:,.2f}\n\
+Valor {stock} a la compra: {value_each_purchase:,.2f} EUR\n\
+Valor {stock} ahora: {value_position_now:,.2f} EUR\n\
+Numero de compras: {buying_times}\n\
+Comision por operacion: {commission_broker:,.2f} EUR\n\
+Comisiones Totales: {total_fees_broker:,.2f} EUR\n\
+Ventas Ganadoras: {winning_sales} \n\
+Ventas Perdedoras: {loosing_sales} \n\
+Ganacias hasta ahora: {earned_money:,.2f} EUR\n\
 Tiempo corriendo: {datetime.now() - startTime}\n\
         "
         )
 
-        valores = (
+        # Insert values in DB table, values
+        sql_insert = """INSERT INTO datos (balance, stop_value, value_each_purchase, buying_times,
+        winning_sales, loosing_sales,
+        earned_money, commission_broker, total_fees_broker, stock, price_now, purchased_items)
+              VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              """
+        db_query(
+            sql_insert,
             balance,
-            valor_stop,
-            objetos_comprados,
-            compra,
-            compras,
-            ventas_ganadoras,
-            ventas_perdedoras,
-            ganancia_total,
-            comision,
-            comisiones,
-            moneda,
+            stop_value,
+            value_each_purchase,
+            buying_times,
+            winning_sales,
+            loosing_sales,
+            earned_money,
+            commission_broker,
+            total_fees_broker,
+            stock,
+            price_now,
+            purchased_items,
         )
-
-        insert_values(valores)
-
-        time.sleep(60)
+        time.sleep(10)
 
 except KeyboardInterrupt:
     pass

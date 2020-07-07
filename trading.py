@@ -10,7 +10,8 @@ import time
 import os
 
 import sys
-from datetime import datetime
+
+import datetime
 
 STOCK = sys.argv[1]
 # STOCK = "EURUSD=X"
@@ -39,29 +40,6 @@ def db_query(query, *args):
             con.close()
     return data
 
-
-# def insert_values(table, task):
-#     """
-#     Create a new task
-#     :param task:
-#     :return: last id from table
-#     """
-#     sql = """INSERT INTO datos (balance, stop_value, value_each_purchase, purchased_items,
-#         winning_sales, loosing_sales,
-#         earned_money, commission_broker, total_fees_broker, stock, price_now)
-#               VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-#               """
-#     con = sqlite3.connect(DATABASE)
-#     cur = con.cursor()
-#     cur.execute(sql, task)
-#     con.commit()
-#     cur.close()
-#     con.close()
-#     return cur.lastrowid
-
-
-# con = sqlite3.connect(DATABASE)
-# cur = con.cursor()
 
 try:
     sql_load = "SELECT * FROM datos WHERE stock=?  ORDER BY id DESC LIMIT 1"
@@ -92,14 +70,14 @@ except Exception:
     purchased_items = 0
 
 
-startTime = datetime.now()
+startTime = datetime.datetime.now()
 
 try:
     while True:
         # Get new price for the stock
         price_now = get_live_price(STOCK)
 
-        # Compra
+        # Buy
         if purchased_items <= 0:
             value_position_now = value_each_purchase / price_now
             purchased_items = value_position_now
@@ -110,7 +88,7 @@ try:
 
         value_position_now = price_now * purchased_items
 
-        # Venta ganancia
+        # Sell winning
         if value_position_now > value_each_purchase + (2 * stop_value):
             balance += value_position_now - commission_broker
             earned_money += value_position_now - value_each_purchase
@@ -118,7 +96,7 @@ try:
             winning_sales += 1
             total_fees_broker += commission_broker
 
-        # Venta perdida
+        # Sell loosing
         if value_position_now < value_each_purchase - stop_value:
             balance += value_position_now - commission_broker
             earned_money += value_position_now - value_each_purchase
@@ -128,18 +106,18 @@ try:
 
         os.system("clear")
         print(
-            f"Balance {balance:,.2f} EUR\n\
-Price of {stock} now: {price_now:,.4f} EUR\n\
-{stock} Comprados: {purchased_items:,.2f}\n\
-Valor {stock} a la compra: {value_each_purchase:,.2f} EUR\n\
-Valor {stock} ahora: {value_position_now:,.2f} EUR\n\
-Numero de compras: {buying_times}\n\
-Comision por operacion: {commission_broker:,.2f} EUR\n\
-Comisiones Totales: {total_fees_broker:,.2f} EUR\n\
-Ventas Ganadoras: {winning_sales} \n\
-Ventas Perdedoras: {loosing_sales} \n\
-Ganacias hasta ahora: {earned_money:,.2f} EUR\n\
-Tiempo corriendo: {datetime.now() - startTime}\n\
+    f"Balance {balance:,.2f}\n\
+Price of {stock} now: {price_now:,.4f}\n\
+{stock} Bought: {purchased_items:,.2f}\n\
+Value {stock} when bought: {value_each_purchase:,.2f}\n\
+Value {stock} now: {value_position_now:,.2f}\n\
+Number of buys: {buying_times}\n\
+Commission Broker: {commission_broker:,.2f}\n\
+Total Commision Paid: {total_fees_broker:,.2f}\n\
+Winning Sales: {winning_sales} \n\
+Loosing Sales: {loosing_sales} \n\
+Earned Money: {earned_money:,.2f}\n\
+Time running the backtesting: {datetime.datetime.now() - startTime}\n\
         "
         )
 

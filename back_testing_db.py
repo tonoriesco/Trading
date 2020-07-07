@@ -10,7 +10,8 @@ import sqlite3
 import os
 
 import sys
-from datetime import datetime
+import datetime
+# from datetime import datetime
 
 STOCK = sys.argv[1]
 # STOCK = "EURUSD=X"
@@ -54,7 +55,7 @@ stock = STOCK
 purchased_items = 0
 
 
-startTime = datetime.now()
+startTime = datetime.datetime.now()
 
 try:
 
@@ -127,17 +128,20 @@ os.system("clear")
 # Sell last position
 balance += value_position_now - commission_broker
 print(
-    f"Balance {balance:,.2f} EUR\n\
-Price of {stock} now: {price_now:,.4f} EUR\n\
-{stock} Comprados: {purchased_items:,.2f}\n\
-Valor {stock} a la compra: {value_each_purchase:,.2f} EUR\n\
-Valor {stock} ahora: {value_position_now:,.2f} EUR\n\
-Numero de compras: {buying_times}\n\
-Comision por operacion: {commission_broker:,.2f} EUR\n\
-Comisiones Totales: {total_fees_broker:,.2f} EUR\n\
-Ventas Ganadoras: {winning_sales} \n\
-Ventas Perdedoras: {loosing_sales} \n\
-Ganacias hasta ahora: {earned_money:,.2f} EUR\n\
-Tiempo corriendo: {datetime.now() - startTime}\n\
+    f"Balance {balance:,.2f}\n\
+Price of {stock} now: {price_now:,.4f}\n\
+{stock} Bought: {purchased_items:,.2f}\n\
+Value {stock} when bought: {value_each_purchase:,.2f}\n\
+Value {stock} now: {value_position_now:,.2f}\n\
+Number of buys: {buying_times}\n\
+Commission Broker: {commission_broker:,.2f}\n\
+Total Commision Paid: {total_fees_broker:,.2f}\n\
+Winning Sales: {winning_sales} \n\
+Loosing Sales: {loosing_sales} \n\
+Earned Money: {earned_money:,.2f}\n\
+Time running the backtesting: {datetime.datetime.now() - startTime}\n\
         "
+
 )
+
+

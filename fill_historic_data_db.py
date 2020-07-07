@@ -41,7 +41,7 @@ while not connected:
         # print(f"Connected to Yahoo\nGot {df} values\n")
     except Exception as e:
         print("type error: " + str(e))
-        time.sleep(5)
+        # time.sleep(5)
         pass
 
 

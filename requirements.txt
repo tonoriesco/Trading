@@ -34,3 +34,4 @@ w3lib==1.22.0
 websockets==8.1
 wrapt==1.12.1
 yahoo-fin==0.8.5
+

@@ -10,27 +10,29 @@ Version 0.2
 
 2020-07-05
 
-## Release notes
+## Release notes v0.2
 
-New version with database support.
-All the results are stored in a local database for postprocessing.
+* Lots of improvements. New protocol and separation of funtions to help the new strategies.
+* New version with database support.
+* All the results are stored in a local database if needed for postprocessing.
+* Now the pair is given in the command line.
+* If DB is not used or the DB's are differents, several instances of the program can be runned in paralel.
 
-## Description
+## Description v0.2
 
-**test_trading** is the open source version of my idea about the correct trading in terms of risk and take profit.
+**trading.py** is the open source version of my idea about the correct trading in terms of risk and take profit.
 Currently working with a risk/reward of 1:2
-In future version all the parameters, pairs, etc. will be inputs from the user.
 
 Version 0.1
 
 2020-07-04
 
-## Release notes
+## Release notes v0.1
 
 First version
 
-## Description
+## Description v0.1
 
-**test_trading** is the open source version of my idea about the correct trading in terms of risk and take profit.
+**trading.py** is the open source version of my idea about the correct trading in terms of risk and take profit.
 Currently working with a risk/reward of 1:2
 In future version all the parameters, pairs, etc. will be inputs from the user.

@@ -5,6 +5,7 @@
 		}
 	],
 	"settings": {
-		"python.pythonPath": "env/bin/python"
+		"python.pythonPath": "env/bin/python",
+		"git.ignoreLimitWarning": true
 	}
 }

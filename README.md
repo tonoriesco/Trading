@@ -6,6 +6,19 @@ Systematic Trading in python
 
 [https://riesco.ch](Tono Riesco)
 
+Version 0.4
+2020-07-09
+
+## Release notes v0.4
+
+* Added a parameter file for loading data from a file in YAML format
+* Added parameter to the command line for using or not the database when runnig the trades.
+* Splited all the program in functions.
+* Defined a strategy function in the program to isolate from the rest. In next versions will be readed from the file
+* If DB is not used or the DB's are differents, several instances of the program can be runned in paralel.
+* Concurrent work of paralel strategies with the database support.
+* Recover the last values from the runs for each stock, index, forex pair, etc.
+
 Version 0.2
 
 2020-07-05
@@ -16,7 +29,6 @@ Version 0.2
 * New version with database support.
 * All the results are stored in a local database if needed for postprocessing.
 * Now the pair is given in the command line.
-* If DB is not used or the DB's are differents, several instances of the program can be runned in paralel.
 
 ## Description v0.2
 

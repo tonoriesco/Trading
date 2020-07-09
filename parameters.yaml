@@ -1,0 +1,13 @@
+---
+  If you want to use the parameters here instead of the data retrieved from the database
+  or the defaults, use the flag -p in the command line of trading.py
+# Starting balance in account
+balance: 1000000
+# Where we stop the trade and sell
+stop_value : 100
+# Broker's commission for each buy, sell
+commission_broker : 2
+# Value for each purchased
+value_each_purchase : 100000
+# Database name if used
+database : data.sqlite3

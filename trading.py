@@ -249,7 +249,7 @@ def main():
             print(f"Value {item} now: {value_position_now:,.2f}")
             print(f"Number of buys: {buying_times}")
             print(f"Commission Broker: {commission_broker:,.2f}")
-            print(f"Total Commision Paid: {total_fees_broker:,.2f}")
+            print(f"Total Commission Paid: {total_fees_broker:,.2f}")
             print(f"Winning Sales: {winning_sales} ")
             print(f"Loosing Sales: {loosing_sales} ")
             print(f"Earned Money: {earned_money:,.2f}")

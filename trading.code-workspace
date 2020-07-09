@@ -6,7 +6,10 @@
 	],
 	"settings": {
 		"python.pythonPath": "env/bin/python",
-		"git.ignoreLimitWarning": true
+		"git.ignoreLimitWarning": true,
+		"cSpell.words": [
+			"forex"
+		]
 	},
 	"launch": {
 		"version": "0.2.0",

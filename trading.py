@@ -196,7 +196,7 @@ def sell(item, quantity):
 
 
 def strategy(item):
-    global stop_value, SMA100, SMA20
+    global stop_value, SMA100, SMA20, SMA200
 
     ##############################################################
     # price = get_live_price(item)
@@ -211,22 +211,40 @@ def strategy(item):
     #        sell(item, purchased_items)
     ##############################################################
 
-    SMA_list_100 = db_query(
-        f"SELECT avg(price_now) FROM data WHERE item = '{item}' and time(date) > time('now','-100 minutes');"
-    )
-    SMA_list_20 = db_query(
-        f"SELECT avg(price_now) FROM data WHERE item = '{item}' and time(date) > time('now','-20 minutes');"
-    )
-    if SMA_list_100 and SMA_list_20:
-        SMA20 = SMA_list_20[0][0]
-        SMA100 = SMA_list_100[0][0]
-        value_position_now = get_live_price(item) * purchased_items
+    ##############################################################
+    # SMA_list_100 = db_query(
+    #     f"SELECT avg(price_now) FROM data WHERE item = '{item}' and datetime(date) > datetime('now','-100 minutes');"
+    # )
+    # SMA_list_20 = db_query(
+    #     f"SELECT avg(price_now) FROM data WHERE item = '{item}' and datetime(date) > datetime('now','-20 minutes');"
+    # )
+    # if SMA_list_100 and SMA_list_20:
+    #     SMA20 = SMA_list_20[0][0]
+    #     SMA100 = SMA_list_100[0][0]
+    #     value_position_now = get_live_price(item) * purchased_items
 
-        if SMA20 and SMA100:
-            if SMA20 < SMA100 and value_position_now > 0:
+    #     if SMA20 and SMA100:
+    #         if SMA20 < SMA100 and value_position_now > 0:
+    #             sell(item, purchased_items)
+
+    #         if SMA20 > SMA100 and value_position_now == 0:
+    #             buy(item, value_each_purchase)
+    ###############################################################
+
+    SMA_list_200 = db_query(
+        f"SELECT avg(price_now) FROM data WHERE item = '{item}' and datetime(date) > datetime('now','-200 minutes');"
+    )
+
+    if SMA_list_200:
+        SMA200 = SMA_list_200[0][0]
+        price = get_live_price(item)
+        value_position_now = price * purchased_items
+
+        if SMA200:
+            if SMA200 > price and value_position_now > 0:
                 sell(item, purchased_items)
 
-            if SMA20 > SMA100 and value_position_now == 0:
+            if SMA200 < price and value_position_now == 0:
                 buy(item, value_each_purchase)
 
 
@@ -266,7 +284,7 @@ def main():
             print(f"Loosing Sales: {loosing_sales} ")
             print(f"Earned Money: {earned_money:,.2f}")
             print(f"Time running the program: {time_running}")
-            print(f"SMA20 - SMA100: {(SMA20 - SMA100):,.4f}")
+            print(f"SMA200: {SMA200:,.4f}")
             print("Press (Crtl + C) to stop.")
 
             if database:

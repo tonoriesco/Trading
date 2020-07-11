@@ -12,8 +12,6 @@
                 "BTC-USD",
                 "-d",
                 "data.db",
-                "-f",
-                "parameters.yaml",
             ]
         }
     ]

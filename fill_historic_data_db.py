@@ -3,7 +3,8 @@
 # !pip3 install pandas_datareader
 
 import sqlite3
-import pandas as pd
+
+# import pandas as pd
 from pandas_datareader import data
 import sys
 

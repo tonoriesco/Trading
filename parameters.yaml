@@ -1,13 +1,24 @@
 ---
-  If you want to use the parameters here instead of the data retrieved from the database
-  or the defaults, use the flag -p in the command line of trading.py
+# If you want to use the parameters here instead of the data retrieved from the database
+# or the defaults, use the flag -p in the command line of trading.py
+
 # Starting balance in account
 balance: 1000000
 # Where we stop the trade and sell
-stop_value : 100
+stop_value: 100
 # Broker's commission for each buy, sell
-commission_broker : 2
+commission_broker: 2
 # Value for each purchased
-value_each_purchase : 100000
+value_each_purchase: 100000
 # Database name if used
-database : data.db
+database: "data.db"
+# Earned money until now
+earned_money: 0
+buying_times: 0
+winning_sales: 0
+loosing_sales: 0
+total_fees_broker: 0
+# item = "EURUSD=X"
+purchased_items: 0
+paid_position: 0
+value_position_now: 0

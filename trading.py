@@ -111,6 +111,15 @@ def load_file():
         commission_broker = vars["commission_broker"]
         balance = vars["balance"]
         database = vars["database"]
+        earned_money = vars["earned_money"]
+        buying_times = vars["buying_times"]
+        winning_sales = vars["winning_sales"]
+        loosing_sales = vars["loosing_sales"]
+        total_fees_broker = vars["total_fees_broker"]
+        purchased_items = vars["purchased_items"]
+        paid_position = vars["paid_position"]
+        value_position_now = vars["value_position_now"]
+
         globals().update(locals())
 
     except Exception:
@@ -159,7 +168,7 @@ def buy(item, value_each_purchase):
         quantity = math.floor(value_each_purchase / price)
         paid_position = (quantity * price) + commission_broker
         balance -= paid_position
-        if purchased_items:
+        if purchased_items == 0:
             purchased_items += quantity
         else:
             purchased_items = quantity
@@ -217,11 +226,12 @@ def strategy(item):
             if SMA20 < SMA100 and value_position_now > 0:
                 sell(item, purchased_items)
 
-            if SMA20 > SMA100 and value_position_now < value_each_purchase:
-                buy(item, (value_each_purchase - value_position_now))
+            if SMA20 > SMA100 and value_position_now == 0:
+                buy(item, value_each_purchase)
 
 
 def main():
+    global value_position_now
     # first of all check if the symbol is found in Yahoo Finance, if not, stop and show the result
     try:
         get_live_price(item)

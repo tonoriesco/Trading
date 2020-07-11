@@ -10,4 +10,4 @@ commission_broker : 2
 # Value for each purchased
 value_each_purchase : 100000
 # Database name if used
-database : data.sqlite3
+database : data.db

@@ -11,12 +11,13 @@ import os
 
 import sys
 import datetime
+
 # from datetime import datetime
 
 STOCK = sys.argv[1]
 # STOCK = "EURUSD=X"
-DB_OPERATION = "backtesting.sqlite3"
-DB_DATOS = "stock.sqlite3"
+DB_OPERATION = "backtesting.db"
+DB_DATOS = "stock.db"
 
 
 def db_query(db, query, *args):
@@ -141,7 +142,4 @@ Loosing Sales: {loosing_sales} \n\
 Earned Money: {earned_money:,.2f}\n\
 Time running the backtesting: {datetime.datetime.now() - startTime}\n\
         "
-
 )
-
-

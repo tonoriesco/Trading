@@ -2,7 +2,7 @@
 
 import sqlite3
 
-DATABASE = "datos.sqlite3"
+DATABASE = "datos.db"
 
 con = sqlite3.connect(DATABASE)
 cur = con.cursor()

@@ -20,7 +20,7 @@ pd.core.common.is_list_like = pd.api.types.is_list_like
 
 # ___variables___
 
-DBSTOCK = "stock.sqlite3"
+DBSTOCK = "stock.db"
 
 STOCK = sys.argv[1]
 # Remove the characters that are not nubers and alphabets

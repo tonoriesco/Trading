@@ -13,6 +13,32 @@ import sys
 import numpy as np
 import datetime
 
+# Init variables with defaults
+balance = 1000000
+stop_value = 100
+value_each_purchase = 100000
+buying_times = 0
+winning_sales = 0
+loosing_sales = 0
+earned_money = 0
+commission_broker = 2
+total_fees_broker = 0
+# item = "EURUSD=X"
+purchased_items = 0
+paid_position = 0
+database = "data.db"
+value_position_now = 0
+purchased_items = 0
+value_position_now = 0
+# Init internal variables
+buying_times = 0
+winning_sales = 0
+loosing_sales = 0
+earned_money = 0
+total_fees_broker = 0
+
+startTime = datetime.datetime.now()
+
 
 parser = argparse.ArgumentParser(
     description="Trade a stock, currency pair, etc getting the values from Yahoo."
@@ -44,40 +70,13 @@ parser.add_argument(
     type=str,
     metavar="configuration file",
     help="\nIf present, the file parameters.yaml is read and the values are taken from there.\n\
-        (default: Take the values from DB or defaults if doesn't exist old data)\n\n",
+        (default: Take the values from DB or defaults if doesn't exist old data in the DB)\n\n",
 )
 
 args = parser.parse_args()
 database = args.db
 item = args.item
 para_file = args.para
-# use_db = 1
-# item = "EURUSD=X"
-
-# item = sys.argv[1]
-# item = "KO"
-# item = "EURUSD=X"
-portfolio = {}
-portfolio[item] = 0
-paid_position = {}
-
-
-# Init internal variables
-buying_times = 0
-winning_sales = 0
-loosing_sales = 0
-earned_money = 0
-total_fees_broker = 0
-
-startTime = datetime.datetime.now()
-
-
-def cls():
-    os.system("clear")
-
-
-# def cls():
-#    print("\n" * 100)
 
 
 def db_query(query, *args):
@@ -101,23 +100,6 @@ def db_query(query, *args):
         if con:
             con.close()
     return data
-
-
-def load_default():
-    balance = 1000000
-    stop_value = 100
-    value_each_purchase = 100000
-    buying_times = 0
-    winning_sales = 0
-    loosing_sales = 0
-    earned_money = 0
-    commission_broker = 2
-    total_fees_broker = 0
-    # item = "EURUSD=X"
-    portfolio[item] = 0
-    paid_position[item] = 0
-    database = "data.sqlite3"
-    globals().update(locals())
 
 
 def load_file():
@@ -150,54 +132,53 @@ def load_from_db():
         earned_money = row[0][8]
         commission_broker = row[0][9]
         total_fees_broker = row[0][10]
-        portfolio[item] = row[0][13]
-        paid_position[item] = row[0][14]
+        purchased_items = row[0][13]
+        paid_position = row[0][14]
         globals().update(locals())
 
     # price_now = row[0][12]
     except Exception:
-        load_default()
         print("No old data in de DB, loading defaults")
         time.sleep(2)
 
 
+# If the file exists, take the values from there. If not, try from the DB
+
 if para_file:
     load_file()
-elif database:
-    load_from_db()
 else:
-    load_default()
+    load_from_db()
 
 
 def buy(item, value_each_purchase):
     global balance, portfolio, total_fees_broker, earned_money
-    global buying_times, paid_position, commission_broker
+    global buying_times, paid_position, commission_broker, purchased_items
 
     price = get_live_price(item)
     if not np.isnan(price):
         quantity = math.floor(value_each_purchase / price)
-        paid_position[item] = (quantity * price) + commission_broker
-        balance -= paid_position[item]
-        if item in portfolio:
-            portfolio[item] += quantity
+        paid_position = (quantity * price) + commission_broker
+        balance -= paid_position
+        if purchased_items:
+            purchased_items += quantity
         else:
-            portfolio[item] = quantity
+            purchased_items = quantity
         total_fees_broker += commission_broker
         earned_money -= commission_broker
         buying_times += 1
-        return paid_position[item]
+        return paid_position
 
 
 def sell(item, quantity):
     global balance, portfolio, total_fees_broker, earned_money
-    global winning_sales, loosing_sales, paid_position
+    global winning_sales, loosing_sales, paid_position, purchased_items
 
     price = get_live_price(item)
     if not np.isnan(price):
         balance += (quantity * price) - commission_broker
-        portfolio[item] -= quantity
+        purchased_items -= quantity
         total_fees_broker += commission_broker
-        operation_value = (quantity * price) - paid_position[item] - commission_broker
+        operation_value = (quantity * price) - paid_position - commission_broker
         earned_money += operation_value
         if operation_value < 0:
             loosing_sales += 1
@@ -206,17 +187,38 @@ def sell(item, quantity):
 
 
 def strategy(item):
-    global value_each_purchase, stop_value
-    price = get_live_price(item)
-    if portfolio[item] == 0:
-        paid_position[item] = buy(item, value_each_purchase)
-    if item in portfolio:
-        value_position_now = portfolio[item] * price
-    if value_position_now > paid_position[item] + (2 * stop_value):
-        sell(item, portfolio[item])
+    global stop_value, SMA100, SMA20
 
-    if value_position_now < paid_position[item] - stop_value:
-        sell(item, portfolio[item])
+    ##############################################################
+    # price = get_live_price(item)
+    # if purchased_items == 0:
+    #    paid_position = buy(item, value_each_purchase)
+    # if value_position_now:
+    #    value_position_now = purchased_items * price
+    #    if value_position_now > paid_position + (2 * stop_value):
+    #        sell(item, purchased_items)
+
+    #    if value_position_now < paid_position - stop_value:
+    #        sell(item, purchased_items)
+    ##############################################################
+
+    SMA_list_100 = db_query(
+        f"SELECT avg(price_now) FROM data WHERE item = '{item}' and time(date) > time('now','-100 minutes');"
+    )
+    SMA_list_20 = db_query(
+        f"SELECT avg(price_now) FROM data WHERE item = '{item}' and time(date) > time('now','-20 minutes');"
+    )
+    if SMA_list_100 and SMA_list_20:
+        SMA20 = SMA_list_20[0][0]
+        SMA100 = SMA_list_100[0][0]
+        value_position_now = get_live_price(item) * purchased_items
+
+        if SMA20 and SMA100:
+            if SMA20 < SMA100 and value_position_now > 0:
+                sell(item, purchased_items)
+
+            if SMA20 > SMA100 and value_position_now < value_each_purchase:
+                buy(item, (value_each_purchase - value_position_now))
 
 
 def main():
@@ -235,25 +237,26 @@ def main():
             # global item
             strategy(item)
             price_now = get_live_price(item)
-            value_position_now = portfolio[item] * price_now
+            value_position_now = purchased_items * price_now
 
-            cls()
+            # os.system("clear")
             # To clean the milliseconds in calculations
             time_running = str(datetime.datetime.now() - startTime).split(".")[0]
 
-            # os.system("clear")
+            os.system("clear")
             print(f"Balance {balance:,.2f}")
             print(f"Price of {item} now: {price_now:,.4f}")
-            print(f"Number of {item} Bought: {portfolio[item]:,.2f}")
-            print(f"Value {item} when bought: {paid_position[item]:,.2f}")
-            print(f"Value {item} now: {value_position_now:,.2f}")
-            print(f"Number of buys: {buying_times}")
+            print(f"Number of {item} Bought: {purchased_items:,.2f}")
+            print(f"Value of position when bought: {paid_position:,.2f}")
+            print(f"Value of position now: {value_position_now:,.2f}")
             print(f"Commission Broker: {commission_broker:,.2f}")
             print(f"Total Commission Paid: {total_fees_broker:,.2f}")
+            print(f"Number of buys: {buying_times}")
             print(f"Winning Sales: {winning_sales} ")
             print(f"Loosing Sales: {loosing_sales} ")
             print(f"Earned Money: {earned_money:,.2f}")
             print(f"Time running the program: {time_running}")
+            print(f"SMA20 - SMA100: {(SMA20 - SMA100):,.4f}")
             print("Press (Crtl + C) to stop.")
 
             if database:
@@ -276,8 +279,8 @@ def main():
                     total_fees_broker,
                     item,
                     price_now,
-                    portfolio[item],
-                    paid_position[item],
+                    purchased_items,
+                    paid_position,
                 )
             time.sleep(60)
     except KeyboardInterrupt:

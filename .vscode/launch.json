@@ -9,8 +9,9 @@
             "console": "integratedTerminal",
             "args": [
                 "-i",
-                "EURCHF=X",
-                "-d"
+                "BTC-USD",
+                "-d",
+                "data.db"
             ]
         }
     ]

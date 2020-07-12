@@ -36,7 +36,7 @@ winning_sales = 0
 loosing_sales = 0
 earned_money = 0
 total_fees_broker = 0
-
+SMA200 = 0.0
 startTime = datetime.datetime.now()
 
 
@@ -239,13 +239,14 @@ def strategy(item):
         SMA200 = SMA_list_200[0][0]
         price = get_live_price(item)
         value_position_now = price * purchased_items
-
-        if SMA200:
+        if SMA200 is not None:
             if SMA200 > price and value_position_now > 0:
                 sell(item, purchased_items)
 
             if SMA200 < price and value_position_now == 0:
                 buy(item, value_each_purchase)
+        else:
+            SMA200 = 0
 
 
 def main():

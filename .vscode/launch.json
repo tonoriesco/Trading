@@ -9,9 +9,11 @@
             "console": "integratedTerminal",
             "args": [
                 "-i",
-                "BTC-USD",
+                "EURCHF=X",
                 "-d",
                 "data.db",
+                "-f",
+                "parameters.yaml"
             ]
         }
     ]
